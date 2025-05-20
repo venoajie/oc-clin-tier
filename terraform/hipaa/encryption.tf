@@ -1,37 +1,35 @@
-# Enable OCI Vault for encryption keys
+# HIPAA-Compliant Encryption Setup
+# -------------------------------
+# Creates a KMS vault and encryption key for patient data
+# Free-tier eligible (VIRTUAL_PRIVATE vault type)
+
+# Virtual vault for managing encryption keys
 resource "oci_kms_vault" "clinic_vault" {
-  compartment_id = var.compartment_ocid
-  display_name  = "clinic-hipaa-vault"
-  vault_type    = "VIRTUAL_PRIVATE"  # Free tier eligible
+  compartment_id = var.compartment_ocid  # Target compartment OCID
+  display_name   = "clinic-hipaa-vault" # Case-sensitive display name
+  vault_type     = "VIRTUAL_PRIVATE"    # Free tier option (not DEFAULT)
 }
 
-# Create master encryption key
+# Master encryption key for patient data
 resource "oci_kms_key" "patient_data_key" {
   compartment_id = var.compartment_ocid
-  display_name  = "patient-data-key"
+  display_name   = "patient-data-key"   # Must be unique per compartment
+  
+  # 256-bit AES encryption (HIPAA minimum requirement)
   key_shape {
-    algorithm = "AES"
-    length    = 256  # HIPAA minimum requirement
+    algorithm = "AES"  
+    length    = 256     # Key size in bits
   }
+
+  # Vault connection (must exist before key creation)
   management_endpoint = oci_kms_vault.clinic_vault.management_endpoint
 
-  # Auto-rotate every 90 days (HIPAA recommendation)
-  rotation_interval_in_days = 90
+  # Automatic key rotation (HIPAA §164.312(a)(2)(iv))
+  rotation_interval_in_days = 90 # Rotates every 3 months
 }
 
-# Encrypt Autonomous Database
-resource "oci_database_autonomous_database_keystore" "db_encryption" {
-  autonomous_database_id = oci_database_autonomous_database.clinic_db.id
-  key_store_id          = oci_kms_vault.clinic_vault.id
-}
-
-resource "oci_kms_vault" "clinic_vault" {
-  compartment_id = var.compartment_ocid
-  display_name  = "clinic-hipaa-vault"
-  vault_type    = "VIRTUAL_PRIVATE"
-}
-
-# Add to bottom of encryption.tf
-output "key_ocid" {
-  value = oci_kms_key.patient_data_key.id
+# Output the key OCID for application integration
+output "kms_key_ocid" {
+  description = "OCID of the patient data encryption key"
+  value       = oci_kms_key.patient_data_key.id
 }
