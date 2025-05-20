@@ -1,3 +1,8 @@
+provider "oci" {
+  tenancy_ocid     = var.tenancy_ocid
+  region           = "us-phoenix-1"  # Free tier region
+}
+
 # Always Free Autonomous DB
 resource "oci_database_autonomous_database" "clinic_db" {
   compartment_id   = var.compartment_ocid
@@ -23,4 +28,10 @@ resource "oci_core_instance" "app_server" {
     source_type = "image"
     source_id   = data.oci_core_images.oracle_linux.images[0].id
   }
+}
+
+resource "oci_budgets_budget" "free_guard" {
+  compartment_id = var.tenancy_ocid
+  amount         = 10  # USD threshold
+  reset_period   = "MONTHLY"
 }
