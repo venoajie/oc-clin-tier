@@ -1,5 +1,5 @@
 
-provider "oci" {
+provider "oracle/oci" {
   tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq"
   user_ocid        = "ocid1.user.oc1..aaaaaaaa2fx3phwcpu5uhmxxcvpkwciuoh5uqktu65kzqq7pte3xki6wjthq"
   fingerprint      = "47:09:4b:9e:3c:0a:fa:ab:33:d3:8f:e9:b3:d0:06:60"
