@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
 
 WORKDIR /app
 
-RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr==0.0.8
+RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr==25.1.1
 
 COPY app/ .
 
