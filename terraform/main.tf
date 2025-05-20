@@ -9,7 +9,7 @@ provider "oci" {
 
 # Always Free Autonomous DB
 resource "oci_database_autonomous_database" "clinic_db" {
-  compartment_id   = ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq
+  compartment_id   = "ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq"
   db_name         = "CLINICDB"
   cpu_core_count  = 1
   data_storage_size_in_tbs = 1  # 20GB max (free)
@@ -19,7 +19,7 @@ resource "oci_database_autonomous_database" "clinic_db" {
 
 # Free-tier eligible VM
 resource "oci_core_instance" "app_server" {
-  compartment_id = ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq
+  compartment_id = "ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq"
   shape          = "VM.Standard.E2.1"  # Free shape
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
