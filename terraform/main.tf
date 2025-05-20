@@ -1,11 +1,15 @@
+
 provider "oci" {
-  tenancy_ocid     = var.tenancy_ocid
-  region           = "us-phoenix-1"  # Free tier region
+  tenancy_ocid     = "ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq"
+  user_ocid        = "ocid1.user.oc1..aaaaaaaa2fx3phwcpu5uhmxxcvpkwciuoh5uqktu65kzqq7pte3xki6wjthq"
+  fingerprint      = "47:09:4b:9e:3c:0a:fa:ab:33:d3:8f:e9:b3:d0:06:60"
+  private_key_path = "/home/ubuntu/.oci/oci_api_key.pem"
+  region           = "eu-frankfurt-1"
 }
 
 # Always Free Autonomous DB
 resource "oci_database_autonomous_database" "clinic_db" {
-  compartment_id   = var.compartment_ocid
+  compartment_id   = ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq
   db_name         = "CLINICDB"
   cpu_core_count  = 1
   data_storage_size_in_tbs = 1  # 20GB max (free)
@@ -15,7 +19,7 @@ resource "oci_database_autonomous_database" "clinic_db" {
 
 # Free-tier eligible VM
 resource "oci_core_instance" "app_server" {
-  compartment_id = var.compartment_ocid
+  compartment_id = ocid1.tenancy.oc1..aaaaaaaapk5a76iob5ujd7byfio3cmfosyj363ogf4hjmti6zm5ojksexgzq
   shape          = "VM.Standard.E2.1"  # Free shape
   availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 
