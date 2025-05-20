@@ -14,4 +14,4 @@ RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr
 
 COPY . .
 
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.address=89.168.104.162:8501"]
