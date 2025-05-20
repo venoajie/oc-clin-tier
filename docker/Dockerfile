@@ -12,6 +12,6 @@ WORKDIR /app
 
 RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr
 
-COPY app/ .
+COPY . .
 
 CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0"]
