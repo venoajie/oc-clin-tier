@@ -2,9 +2,6 @@
 # Use a Python image with uv pre-installed
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
-# Install system dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt-get -yq install apt-utils
-
 # Install OCI CLI + Instant Client (free)
 RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     wget https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip -O /tmp/instantclient.zip && \
@@ -13,7 +10,7 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
     ldconfig
 
-    # Install the project into `/app`
+# Install the project into `/app`
 WORKDIR /app
 
 # Enable bytecode compilation
