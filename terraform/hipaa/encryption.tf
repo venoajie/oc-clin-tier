@@ -1,52 +1,63 @@
-# HIPAA Encryption Module
-# ======================
-# Manages KMS vault and encryption keys for patient data
-# Free-tier compatible (VIRTUAL_PRIVATE vault type)
+# =============================================
+# HIPAA-COMPLIANT ENCRYPTION FOR PATIENT DATA
+# =============================================
+# This file creates:
+# 1. A secure vault to manage encryption keys
+# 2. A master key for encrypting patient records
+# All resources are Oracle Cloud Free Tier eligible
 
-# Key Vault Configuration
-# ----------------------
+# --------------------------
+# STEP 1: CREATE THE VAULT
+# --------------------------
 resource "oci_kms_vault" "clinic_vault" {
-  compartment_id = var.compartment_ocid  # Required: Target compartment OCID
-  display_name   = "clinic-hipaa-vault-${var.env}"  # Environment-aware naming
-  vault_type     = "VIRTUAL_PRIVATE"    # Free tier option (avoid "DEFAULT")
+  # Where to create the vault (replace with your compartment OCID)
+  compartment_id = var.compartment_ocid  
+  
+  # Name it something recognizable
+  display_name   = "clinic-hipaa-vault" 
+  
+  # MUST be "VIRTUAL_PRIVATE" for free tier
+  vault_type     = "VIRTUAL_PRIVATE"    
 
+  # Safety lock - prevents accidental deletion
   lifecycle {
-    prevent_destroy = true  # Critical: Prevents accidental deletion
+    prevent_destroy = true  
   }
 }
 
-# Master Encryption Key
-# --------------------
+# --------------------------
+# STEP 2: CREATE ENCRYPTION KEY 
+# --------------------------
 resource "oci_kms_key" "patient_data_key" {
+  # Same compartment as the vault
   compartment_id = var.compartment_ocid
-  display_name   = "patient-data-key-${var.env}"  # Unique per environment
+  
+  # Clearly name the key
+  display_name   = "patient-data-key"   
 
-  # 256-bit AES-CBC (HIPAA Minimum Standard)
+  # Encryption settings (HIPAA requires 256-bit AES)
   key_shape {
-    algorithm = "AES"
-    length    = 256  # Bits
+    algorithm = "AES"  # Advanced Encryption Standard
+    length    = 256     # Key size in bits (stronger than 128)
   }
 
-  # Vault association (implicit dependency)
+  # Connect this key to our vault
   management_endpoint = oci_kms_vault.clinic_vault.management_endpoint
 
-  # Automatic rotation (HIPAA §164.312(a)(2)(iv))
-  rotation_interval_in_days = 90  # Quarterly rotation
-
-  lifecycle {
-    ignore_changes = [rotation_interval_in_days]  # Allow manual rotations
-  }
+  # Rotate key every 90 days (HIPAA best practice)
+  rotation_interval_in_days = 90  
 }
 
-# Outputs for Integration
-# ----------------------
-output "kms_vault_ocid" {
-  description = "OCID of the HIPAA-compliant vault"
+# --------------------------
+# STEP 3: OUTPUT IMPORTANT INFO
+# --------------------------
+output "vault_id" {
+  description = "ID of the encryption vault (needed for database setup)"
   value       = oci_kms_vault.clinic_vault.id
 }
 
-output "data_key_ocid" {
-  description = "OCID of the patient data encryption key"
+output "key_id" {
+  description = "ID of the patient data encryption key (keep secret!)"
   value       = oci_kms_key.patient_data_key.id
-  sensitive   = true  # Marks output as sensitive in logs
+  sensitive   = true  # Hides this from logs
 }
