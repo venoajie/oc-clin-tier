@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bullseye
+FROM python:3.11-slim-bullseye
 
 # Install OCI CLI + Instant Client (free)
 RUN apt-get update && apt-get install -y libaio1 wget unzip && \
