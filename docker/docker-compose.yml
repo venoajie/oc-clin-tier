@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  clinic-app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_HOST=${DB_HOST}  # From Terraform outputs
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
