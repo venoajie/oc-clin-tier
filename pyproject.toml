@@ -1,5 +1,5 @@
 [project]
-name = "client-helper"
+name = "clinic-app"
 version = "0.1.0"
 
 authors = [
