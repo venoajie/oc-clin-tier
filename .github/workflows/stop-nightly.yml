@@ -1,0 +1,11 @@
+# .github/workflows/stop-nightly.yml
+name: Stop Dev Resources
+on:
+  schedule:
+    - cron: '0 20 * * *'  # 8PM UTC daily
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/stop_dev_resources.sh
