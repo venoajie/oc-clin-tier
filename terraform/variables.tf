@@ -7,3 +7,15 @@ variable "compartment_ocid" {
     error_message = "Invalid compartment OCID format."
   }
 }
+
+
+variable "compartment_ocid" {
+  type        = string
+  description = "Target compartment OCID for encryption resources"
+}
+
+variable "env" {
+  type        = string
+  description = "Deployment environment (dev/stage/prod)"
+  default     = "dev"
+}
