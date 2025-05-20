@@ -30,3 +30,8 @@ resource "oci_kms_vault" "clinic_vault" {
   display_name  = "clinic-hipaa-vault"
   vault_type    = "VIRTUAL_PRIVATE"
 }
+
+# Add to bottom of encryption.tf
+output "key_ocid" {
+  value = oci_kms_key.patient_data_key.id
+}
