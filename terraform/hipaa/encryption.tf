@@ -24,3 +24,9 @@ resource "oci_database_autonomous_database_keystore" "db_encryption" {
   autonomous_database_id = oci_database_autonomous_database.clinic_db.id
   key_store_id          = oci_kms_vault.clinic_vault.id
 }
+
+resource "oci_kms_vault" "clinic_vault" {
+  compartment_id = var.compartment_ocid
+  display_name  = "clinic-hipaa-vault"
+  vault_type    = "VIRTUAL_PRIVATE"
+}
