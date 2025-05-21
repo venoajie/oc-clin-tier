@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     rm /tmp/instantclient.zip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
     ldconfig\
-    sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 8501 -j ACCEPT
+    iptables -I INPUT 6 -m state --state NEW -p tcp --dport 8501 -j ACCEPT
 
 WORKDIR /app
 
