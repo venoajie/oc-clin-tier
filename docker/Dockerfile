@@ -15,10 +15,14 @@ RUN    apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-RUN pip install streamlit notion-client lyzr  --upgrade pip
 
+RUN pip install  --upgrade pip streamlit notion-client lyzr 
+
+# Copy ALL files (including app.py)
 COPY . .
 
+# Explicitly verify file exists during build
+RUN ls -l /app/app.py  # This will fail if file is missing
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
