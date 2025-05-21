@@ -10,31 +10,6 @@ RUN apt-get update && \
     ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Oracle Instant Client (OCI optimized)
-ARG INSTANT_CLIENT_VERSION=19.19
-RUN wget -q https://download.oracle.com/otn_software/linux/instantclient/${INSTANT_CLIENT_VERSION}/instantclient-basiclite-linux.x64-${INSTANT_CLIENT_VERSION}.0.0.0dbru.zip -O /tmp/instantclient.zip && \
-    unzip /tmp/instantclient.zip -d /usr/lib && \
-    rm /tmp/instantclient.zip && \
-    ln -s /usr/lib/instantclient_*_* /usr/lib/instantclient && \
-    echo /usr/lib/instantclient > /etc/ld.so.conf.d/oracle-instantclient.conf && \
-    ldconfig
-
-# ----------------------------
-# Final stage
-FROM python:3.11-slim-bookworm
-
-# OCI security hardening
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libaio1 \
-    libnss3-tools \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy Oracle libs from builder
-COPY --from=builder /usr/lib/instantclient* /usr/lib/instantclient/
-COPY --from=builder /etc/ld.so.conf.d/oracle-instantclient.conf /etc/ld.so.conf.d/
-RUN ldconfig
-
 WORKDIR /app
 
 # Install Python dependencies with hash checking
