@@ -9,7 +9,7 @@ description = "A client helper for streaming and notion"
 readme = "README.md"
 requires-python = "==3.11"
 dependencies =  [
-  "lyzr==0.0.8",
+  "lyzr",
   "notion-client==2.2.0",
   "streamlit==1.29.0",
   "pandas==2.0.2",
