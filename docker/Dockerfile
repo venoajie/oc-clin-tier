@@ -13,11 +13,9 @@ RUN    apt-get install -y --no-install-recommends \
     apt-get clean && \  
     rm -rf /var/lib/apt/lists/*  
 
-RUN apt-get install --upgrade python3-pip -y 
-
 WORKDIR /app
 
-RUN pip install streamlit notion-client lyzr
+RUN pip install streamlit notion-client lyzr  --upgrade pip
 
 COPY . .
 
