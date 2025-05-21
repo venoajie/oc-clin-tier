@@ -1,6 +1,6 @@
 FROM python:3.11-slim-bookworm
 
-# 1. Install system dependencies including wget
+# 1. Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnss3-tools \
@@ -19,19 +19,22 @@ COPY ./app/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# 4. Download and place tokenizer files
+# 4. Download and install tokenizer files to BOTH locations
 RUN wget https://raw.githubusercontent.com/BerriAI/litellm/main/litellm/tokenizers/anthropic_tokenizer.json -P /app/cache/litellm/tokenizers/ && \
     wget https://raw.githubusercontent.com/BerriAI/litellm/main/litellm/tokenizers/cohere_tokenizer.json -P /app/cache/litellm/tokenizers/ && \
-    ln -sf /app/cache/litellm/tokenizers /usr/local/lib/python3.11/site-packages/litellm/litellm_core_utils/tokenizers
+    cp /app/cache/litellm/tokenizers/*.json /usr/local/lib/python3.11/site-packages/litellm/litellm_core_utils/tokenizers/
 
-# 5. Create dedicated user
+# 5. Create symlink
+RUN ln -sf /app/cache/litellm/tokenizers /usr/local/lib/python3.11/site-packages/litellm/litellm_core_utils/tokenizers
+
+# 6. Create dedicated user
 RUN adduser --disabled-password --gecos "" appuser && \
     chown -R appuser:appuser /app
 
-# 6. Copy application files
+# 7. Copy application files
 COPY --chown=appuser:appuser ./app .
 
-# 7. Environment configuration
+# 8. Environment configuration
 ENV LITELLM_CACHE_DIR=/app/cache/litellm \
     XDG_CACHE_HOME=/app/cache \
     TMPDIR=/app/cache/tmp
