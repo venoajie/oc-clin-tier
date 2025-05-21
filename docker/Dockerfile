@@ -16,13 +16,18 @@ RUN    apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 
+# Copy requirements first for caching
+COPY ./app/requirements.txt .
+
 RUN pip install  --upgrade pip streamlit notion-client lyzr 
 
-# Copy ALL files (including app.py)
-COPY . .
 
-# Explicitly verify file exists during build
-RUN ls -l /app/app.py  # This will fail if file is missing
+# Copy the entire app directory
+COPY ./app .
+
+# Verify file exists
+RUN ls -l /app/app.py
+
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
