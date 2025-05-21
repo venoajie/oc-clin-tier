@@ -6,9 +6,8 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     unzip /tmp/instantclient.zip -d /usr/lib && \
     rm /tmp/instantclient.zip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
-    ldconfig\
-    iptables -A INPUT 6 -m state --state NEW -p tcp --dport 8501 -j ACCEPT
-
+    ldconfig
+    
 WORKDIR /app
 
 RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr
@@ -16,3 +15,5 @@ RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr
 COPY . .
 
 CMD ["streamlit", "run", "app.py", "--server.address=89.168.104.162:8501"]
+
+EXPOSE 8501
