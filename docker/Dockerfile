@@ -6,8 +6,9 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     unzip /tmp/instantclient.zip -d /usr/lib && \
     rm /tmp/instantclient.zip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
-    ldconfig
-    
+    ldconfig\
+    firewall-cmd --zone=public --add-port=8501/tcp --permanent
+
 WORKDIR /app
 
 RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr
