@@ -24,11 +24,7 @@ RUN pip install  --upgrade pip streamlit notion-client lyzr
 # Copy the entire app directory
 COPY ./app .
 
-# Verify file exists
-RUN ls -l /app/app.py
-
-
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+USER 1000
 
 EXPOSE 8501
 
