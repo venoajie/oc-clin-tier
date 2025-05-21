@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     rm /tmp/instantclient.zip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
     ldconfig
-
+    
 RUN    apt-get install -y --no-install-recommends \  
     libnss3-tools && \  
     apt-get clean && \  
@@ -15,7 +15,10 @@ RUN    apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-RUN pip install --upgrade pip --no-cache-dir -r requirements.txt
+# Copy requirements first for caching
+COPY ./app/requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire app directory
 COPY ./app .
@@ -29,8 +32,7 @@ RUN mkdir -p /app/cache && \
 ENV XDG_CACHE_HOME=/app/cache \
     LITELLM_CACHE_DIR=/app/cache
 
-ENV LYZR_CACHE_DIR=/app/cache/lyzr
-
+    ENV LYZR_CACHE_DIR=/app/cache/lyzr
 
 USER 1000
 
