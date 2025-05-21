@@ -2,9 +2,10 @@ FROM python:3.11-slim-bullseye
 
 
 # Install only essential dependencies (no Oracle)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libnss3-tools \
+
+RUN    apt-get install -y --no-install-recommends \  
+    libnss3-tools && \  
+    apt-get clean && \  
     rm -rf /var/lib/apt/lists/*  
 
 # Create cache directory with correct permissions
