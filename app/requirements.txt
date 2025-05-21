@@ -1,4 +1,4 @@
-python==3.11.12
+python==3.11
 streamlit
 notion-client
 lyzr

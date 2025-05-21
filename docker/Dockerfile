@@ -19,17 +19,14 @@ WORKDIR /app
 # Copy requirements first for caching
 COPY ./app/requirements.txt .
 
+RUN pip install  --upgrade pip streamlit notion-client lyzr 
 
-# Install dependencies
-RUN apt-get update && \
-    pip install --no-cache-dir -r requirements.txt
+# Copy the entire app directory
+COPY ./app .
 
+# Verify file exists
+RUN ls -l /app/app.py
 
-# Copy application files
-COPY app .
-
-# Verify critical files exist
-RUN ls -l app.py db.py
 
 HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
