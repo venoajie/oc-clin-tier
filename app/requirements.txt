@@ -1,4 +1,4 @@
-streamlit
-notion-client
-lyzr
-oracledb
+streamlit==1.32.2
+notion-client==2.4.0
+lyzr==0.1.23
+oracledb==2.0.0
