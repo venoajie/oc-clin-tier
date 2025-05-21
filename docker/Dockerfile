@@ -32,8 +32,6 @@ HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 EXPOSE 8501
 
-ENTRYPOINT ["streamlit", "run", "app.py",\
-            "--server.port=8501", \
-            "--server.address=89.168.104.162",\
-            "--server.headless=true"\
-            ]
+CMD ["streamlit", "run", "app.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0"]  # Bind to all interfaces
