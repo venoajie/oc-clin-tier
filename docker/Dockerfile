@@ -1,45 +1,40 @@
-# Multi-stage build for security and minimal footprint
-FROM python:3.11-slim-bookworm as builder
+FROM python:3.11-slim-bullseye
 
-# OCI-specific dependencies (minimal install)
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    libaio1 \
-    wget \
-    unzip \
-    ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+# Install OCI CLI + Instant Client (free)
+RUN apt-get update && apt-get install -y libaio1 wget unzip && \
+    wget https://download.oracle.com/otn_software/linux/instantclient/instantclient-basiclite-linuxx64.zip -O /tmp/instantclient.zip && \
+    unzip /tmp/instantclient.zip -d /usr/lib && \
+    rm /tmp/instantclient.zip && \
+    echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+    ldconfig
+    
+RUN    apt-get install -y --no-install-recommends \  
+    libnss3-tools && \  
+    apt-get clean && \  
+    rm -rf /var/lib/apt/lists/*  
 
 WORKDIR /app
 
-# Install Python dependencies with hash checking
+
+# Copy requirements first for caching
 COPY ./app/requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip check
 
-# Copy application files with non-root user
-COPY --chown=1000:1000 ./app .
+RUN pip install  --upgrade pip streamlit notion-client lyzr 
 
-# OCI-specific optimizations
-ENV STREAMLIT_SERVER_PORT=8501 \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
-    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
-    PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app
+# Copy the entire app directory
+COPY ./app .
 
-# Healthcheck with OCI networking consideration
-HEALTHCHECK --interval=30s --timeout=3s \
-    CMD curl -f http://localhost:8501/_stcore/health || exit 1
+# Verify file exists
+RUN ls -l /app/app.py
 
-# Run as non-root user
-USER 1000
+
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
 
 EXPOSE 8501
 
-ENTRYPOINT ["streamlit", "run", "app.py", \
-            "--server.port=8501", \
-            "--server.address=0.0.0.0", \
-            "--server.headless=true", \
-            "--server.enableCORS=false", \
-            "--server.enableXsrfProtection=false"]
+CMD ["streamlit", "run", "app.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0"]  # Bind to all interfaces
+
+
+     
