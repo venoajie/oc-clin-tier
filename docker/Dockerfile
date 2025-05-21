@@ -37,7 +37,12 @@ RUN mkdir -p /app/cache/tmp && \
     chown appuser:appuser /app/cache/tmp && \
     chmod 770 /app/cache/tmp
 
-USER appuser
+    # Force LiteLLM to use our cache directory
+RUN mkdir -p /app/cache/litellm && \
+    ln -s /app/cache/litellm /usr/local/lib/python3.11/site-packages/litellm/tokenizers && \
+    chown -R 1000:1000 /app/cache
+
+USER 1000  # Switch to appuser
 
 EXPOSE 8501
 
