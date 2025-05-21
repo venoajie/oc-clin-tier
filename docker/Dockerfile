@@ -6,8 +6,7 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     unzip /tmp/instantclient.zip -d /usr/lib && \
     rm /tmp/instantclient.zip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
-    ldconfig\
-    firewall-cmd --zone=public --add-port=8501/tcp --permanent
+    ldconfig
 
 WORKDIR /app
 
