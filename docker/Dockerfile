@@ -2,51 +2,46 @@ FROM python:3.11-slim-bookworm
 
 # 1. Create dedicated user and directories
 RUN adduser --disabled-password --gecos "" appuser && \
-    mkdir -p /app/cache /app/data && \
+    mkdir -p /app/cache/litellm /app/data && \
     chown -R appuser:appuser /app && \
-    chmod -R 750 /app  # More secure than 755
+    chmod -R 770 /app  # More permissive for cache
 
 WORKDIR /app
 
-# 2. Install system dependencies first (better layer caching)
+# 2. Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libnss3-tools \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Install Python requirements with cache control
+# 3. Install Python requirements
 COPY ./app/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     pip cache purge
 
-# 4. Copy application files with correct ownership
+# 4. Force LiteLLM to use our cache directory
+RUN mkdir -p /usr/local/lib/python3.11/site-packages/litellm/litellm_core_utils/tokenizers && \
+    chown -R appuser:appuser /usr/local/lib/python3.11/site-packages/litellm && \
+    chmod -R 777 /usr/local/lib/python3.11/site-packages/litellm  # Security note: Temporary measure
+
+# 5. Copy application files
 COPY --chown=appuser:appuser ./app .
 
-# 5. Comprehensive cache/temp configuration
+# 6. Environment configuration
 ENV XDG_CACHE_HOME=/app/cache \
-    LITELLM_CACHE_DIR=/app/cache \
+    LITELLM_CACHE_DIR=/app/cache/litellm \
     LYZR_CACHE_DIR=/app/cache/lyzr \
     TRANSFORMERS_CACHE=/app/cache \
     HF_HOME=/app/cache \
     TMPDIR=/app/cache/tmp \
     PIP_NO_CACHE_DIR=on
 
-# Create temp subdirectory
-RUN mkdir -p /app/cache/tmp && \
-    chown appuser:appuser /app/cache/tmp && \
-    chmod 770 /app/cache/tmp
-
-    # Force LiteLLM to use our cache directory
-RUN mkdir -p /app/cache/litellm && \
-    ln -s /app/cache/litellm /usr/local/lib/python3.11/site-packages/litellm/tokenizers && \
-    chown -R 1000:1000 /app/cache
-
-USER 1000  # Switch to appuser
+USER appuser
 
 EXPOSE 8501
 
 CMD ["streamlit", "run", "app.py", \
      "--server.port=8501", \
      "--server.address=0.0.0.0", \
-     "--global.developmentMode=false"]  # Important for production
+     "--global.developmentMode=false"]
