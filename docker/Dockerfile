@@ -16,6 +16,8 @@ RUN pip install streamlit==1.29.0 notion-client==2.2.0 lyzr
 COPY . .
 
 
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
 EXPOSE 8501
 
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=89.168.104.162"]
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=89.168.104.162"]
