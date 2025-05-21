@@ -6,7 +6,12 @@ RUN apt-get update && apt-get install -y libaio1 wget unzip && \
     unzip /tmp/instantclient.zip -d /usr/lib && \
     rm /tmp/instantclient.zip && \
     echo /usr/lib/instantclient* > /etc/ld.so.conf.d/oracle-instantclient.conf && \
-    ldconfig
+    ldconfig\
+    # Disable firewalld explicitly (Ubuntu 24)  
+    apt-get install -y --no-install-recommends \  
+    libnss3-tools && \  
+    apt-get clean && \  
+    rm -rf /var/lib/apt/lists/*  
 
 WORKDIR /app
 
